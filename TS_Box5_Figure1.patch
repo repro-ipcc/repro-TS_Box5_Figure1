@@ -1,0 +1,258 @@
+diff --git a/Box5_Figure1_plotting script.py b/Box5_Figure1_plotting script.py
+index 30cc922..6a3f013 100644
+--- a/Box5_Figure1_plotting script.py	
++++ b/Box5_Figure1_plotting script.py	
+@@ -5,6 +5,7 @@ import numpy as np
+ import matplotlib.pyplot as plt
+ from matplotlib import gridspec
+ import cartopy.crs as ccrs
++import matplotlib.patches as patches
+ 
+ 
+ # requires the Iris package. See:
+@@ -51,14 +52,15 @@ col_ssp370 = '#F21111'
+ col_ssp585 = '#840B22'
+ col_ssp534 = '#9A6DC9'
+ 
+-
++path="../dap.ceda.ac.uk/badc/ar6_wg1/data/TS/inputdata_BOX_ts5_fig1/v20220817/"
++CMIP_path=path+"CMIP_data/"
+ # read CMIP6 conc-driven CO2 concentrations
+ #
+-y_hist, co2_hist = np.loadtxt('CMIP6_HIST_CO2.dat',skiprows=1).T
++y_hist, co2_hist = np.loadtxt(CMIP_path+'CMIP6_HIST_CO2.dat',skiprows=1).T
+ 
+-y_ssp, co2_ssp119, co2_ssp126, co2_ssp245, co2_ssp534, co2_ssp370, co2_ssp585 = np.loadtxt('CMIP6_SSP_CO2.dat',skiprows=1).T
++y_ssp, co2_ssp119, co2_ssp126, co2_ssp245, co2_ssp534, co2_ssp370, co2_ssp585 = np.loadtxt(CMIP_path+'CMIP6_SSP_CO2.dat',skiprows=1).T
+ 
+-y_ssp_2300, co2_ssp126_2300, co2_ssp534_2300, co2_ssp585_2300 = np.loadtxt('CMIP6_SSP2300_CO2.dat',skiprows=1).T
++y_ssp_2300, co2_ssp126_2300, co2_ssp534_2300, co2_ssp585_2300 = np.loadtxt(CMIP_path+'CMIP6_SSP2300_CO2.dat',skiprows=1).T
+ 
+ # "historical" data runs to 2014 and then SSPs from 2015 - this leaves a gap when plotted as separate lines
+ # so extend hist data to 2015 so there's no gap in plotting. first year of SSPs is invariant across scenarios to 5 sig.fig.
+@@ -67,7 +69,7 @@ co2_hist = np.append(co2_hist, co2_ssp245[0])
+ 
+ 
+ # read CMIP6 emission-driven CO2 concentrations
+-y_e,co2_e_mmm,co2_e_pc5,co2_e_pc95 = np.loadtxt('CMIP6_e-CO2.dat',skiprows=1).T
++y_e,co2_e_mmm,co2_e_pc5,co2_e_pc95 = np.loadtxt(CMIP_path+'CMIP6_e-CO2.dat',skiprows=1).T
+ 
+ 
+ # create dictionaries for ease of selecting scenarios, colours etc
+@@ -107,12 +109,13 @@ The setup used to generate this data is described extensively in Cross-chapter B
+ Meinshausen et al. [2009](https://doi.org/10.1038/nature08017), [2011](https://doi.org/10.5194/acp-11-1417-2011) and [2020](https://doi.org/10.5194/gmd-13-3571-2020).
+ '''
+ 
+-co2_ssp119_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp119.nc')[0]
+-co2_ssp126_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp126.nc')[0]
+-co2_ssp245_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp245.nc')[0]
+-co2_ssp534_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp534-over.nc')[0]
+-co2_ssp370_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp370.nc')[0]
+-co2_ssp585_magicc = iris.load('MAGICCv7.5.1_atmospheric-co2_esm-ssp585.nc')[0]
++Magic_path=path+"MAGIC_data/"
++co2_ssp119_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp119.nc')[0]
++co2_ssp126_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp126.nc')[0]
++co2_ssp245_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp245.nc')[0]
++co2_ssp534_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp534-over.nc')[0]
++co2_ssp370_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp370.nc')[0]
++co2_ssp585_magicc = iris.load(Magic_path+'MAGICCv7.5.1_atmospheric-co2_esm-ssp585.nc')[0]
+ 
+ 
+ # create array of years and multi-model mean, 5-95% ranges
+@@ -150,40 +153,42 @@ magicc_ssp370_pc5 = np.percentile(co2_ssp370_magicc.data,5,axis=0)
+ 
+ # leading dimension is the year, so crop that off to just leave the flux data
+ 
+-fgco2_ssp119 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp119.txt',skiprows=1).T
+-nbp_ssp119   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp119.txt',skiprows=1).T
+-emiss_ssp119 = np.loadtxt('ffEmsHistoricalSsp119_GtCyr.txt',skiprows=1).T
++Liddicoat_path=path+"Liddicoat_data/"
++
++fgco2_ssp119 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp119.txt',skiprows=1).T
++nbp_ssp119   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp119.txt',skiprows=1).T
++emiss_ssp119 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp119_GtCyr.txt',skiprows=1).T
+ flx_ssp119 = nbp_ssp119[1:] + fgco2_ssp119[1:]
+ emiss_ssp119 = emiss_ssp119[1:]
+ 
+-fgco2_ssp126 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp126.txt',skiprows=1).T
+-nbp_ssp126   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp126.txt',skiprows=1).T
++fgco2_ssp126 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp126.txt',skiprows=1).T
++nbp_ssp126   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp126.txt',skiprows=1).T
+ flx_ssp126 = nbp_ssp126[1:] + fgco2_ssp126[1:]
+-emiss_ssp126 = np.loadtxt('ffEmsHistoricalSsp126_GtCyr.txt',skiprows=1).T
++emiss_ssp126 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp126_GtCyr.txt',skiprows=1).T
+ emiss_ssp126 = emiss_ssp126[1:]
+ 
+-fgco2_ssp245 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp245.txt',skiprows=1).T
+-nbp_ssp245   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp245.txt',skiprows=1).T
++fgco2_ssp245 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp245.txt',skiprows=1).T
++nbp_ssp245   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp245.txt',skiprows=1).T
+ flx_ssp245 = nbp_ssp245[1:] + fgco2_ssp245[1:]
+-emiss_ssp245 = np.loadtxt('ffEmsHistoricalSsp245_GtCyr.txt',skiprows=1).T
++emiss_ssp245 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp245_GtCyr.txt',skiprows=1).T
+ emiss_ssp245 = emiss_ssp245[1:]
+ 
+-fgco2_ssp534 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp534os.txt',skiprows=1).T
+-nbp_ssp534   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp534os.txt',skiprows=1).T
++fgco2_ssp534 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp534os.txt',skiprows=1).T
++nbp_ssp534   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp534os.txt',skiprows=1).T
+ flx_ssp534 = nbp_ssp534[1:] + fgco2_ssp534[1:]
+-emiss_ssp534 = np.loadtxt('ffEmsHistoricalSsp534os_GtCyr.txt',skiprows=1).T
++emiss_ssp534 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp534os_GtCyr.txt',skiprows=1).T
+ emiss_ssp534 = emiss_ssp534[1:]
+ 
+-fgco2_ssp370 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp370.txt',skiprows=1).T
+-nbp_ssp370   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp370.txt',skiprows=1).T
++fgco2_ssp370 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp370.txt',skiprows=1).T
++nbp_ssp370   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp370.txt',skiprows=1).T
+ flx_ssp370 = nbp_ssp370[1:] + fgco2_ssp370[1:]
+-emiss_ssp370 = np.loadtxt('ffEmsHistoricalSsp370_GtCyr.txt',skiprows=1).T
++emiss_ssp370 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp370_GtCyr.txt',skiprows=1).T
+ emiss_ssp370 = emiss_ssp370[1:]
+ 
+-fgco2_ssp585 = np.loadtxt('global_total_FGCO2_GtC_yr_HistoricalSsp585.txt',skiprows=1).T
+-nbp_ssp585   = np.loadtxt('global_total_NBP_GtC_yr_HistoricalSsp585.txt',skiprows=1).T
++fgco2_ssp585 = np.loadtxt(Liddicoat_path+'global_total_FGCO2_GtC_yr_HistoricalSsp585.txt',skiprows=1).T
++nbp_ssp585   = np.loadtxt(Liddicoat_path+'global_total_NBP_GtC_yr_HistoricalSsp585.txt',skiprows=1).T
+ flx_ssp585 = nbp_ssp585[1:] + fgco2_ssp585[1:]
+-emiss_ssp585 = np.loadtxt('ffEmsHistoricalSsp585_GtCyr.txt',skiprows=1).T
++emiss_ssp585 = np.loadtxt(Liddicoat_path+'ffEmsHistoricalSsp585_GtCyr.txt',skiprows=1).T
+ emiss_ssp585 = emiss_ssp585[1:]
+ 
+ y = nbp_ssp585[0]
+@@ -210,15 +215,15 @@ flx_pc95 = dict([('ssp119', np.percentile(flx_ssp119,95,axis=0)), ('ssp126', np.
+ 
+ # get data to 2300 from 4 ESMs (CanESM5, IPSL, UKESM, CESM2):
+ 
+-year,c5_ssp126,c5_ssp534,c5_ssp585 = np.loadtxt('CanESM5_nbp.dat').T
+-year,i6_ssp126,i6_ssp534,i6_ssp585 = np.loadtxt('IPSL-CM6A-LR_nbp.dat').T
+-year,uk_ssp126,uk_ssp534,uk_ssp585 = np.loadtxt('UKESM1-0-LL_nbp.dat').T
+-year,ce2_ssp126,ce2_ssp534,ce2_ssp585 = np.loadtxt('CESM2-WACCM_nbp.dat').T
++year,c5_ssp126,c5_ssp534,c5_ssp585 = np.loadtxt(CMIP_path+'CanESM5_nbp.dat').T
++year,i6_ssp126,i6_ssp534,i6_ssp585 = np.loadtxt(CMIP_path+'IPSL-CM6A-LR_nbp.dat').T
++year,uk_ssp126,uk_ssp534,uk_ssp585 = np.loadtxt(CMIP_path+'UKESM1-0-LL_nbp.dat').T
++year,ce2_ssp126,ce2_ssp534,ce2_ssp585 = np.loadtxt(CMIP_path+'CESM2-WACCM_nbp.dat').T
+ 
+-year,c5_ocn_ssp126,c5_ocn_ssp534,c5_ocn_ssp585 = np.loadtxt('CanESM5_fgco2.dat').T
+-year,i6_ocn_ssp126,i6_ocn_ssp534,i6_ocn_ssp585 = np.loadtxt('IPSL-CM6A-LR_fgco2.dat').T
+-year,uk_ocn_ssp126,uk_ocn_ssp534,uk_ocn_ssp585 = np.loadtxt('UKESM1-0-LL_fgco2.dat').T
+-year,ce2_ocn_ssp126,ce2_ocn_ssp534,ce2_ocn_ssp585 = np.loadtxt('CESM2-WACCM_fgco2.dat').T
++year,c5_ocn_ssp126,c5_ocn_ssp534,c5_ocn_ssp585 = np.loadtxt(CMIP_path+'CanESM5_fgco2.dat').T
++year,i6_ocn_ssp126,i6_ocn_ssp534,i6_ocn_ssp585 = np.loadtxt(CMIP_path+'IPSL-CM6A-LR_fgco2.dat').T
++year,uk_ocn_ssp126,uk_ocn_ssp534,uk_ocn_ssp585 = np.loadtxt(CMIP_path+'UKESM1-0-LL_fgco2.dat').T
++year,ce2_ocn_ssp126,ce2_ocn_ssp534,ce2_ocn_ssp585 = np.loadtxt(CMIP_path+'CESM2-WACCM_fgco2.dat').T
+ 
+ 
+ flx_2300_ssp126 = [
+@@ -318,7 +323,7 @@ y_LU = [2015,2020,2030,2040,2050,2060,2070,2080,2090,2100]
+ # http://c4mip.net/cmip6-experiments
+ # c4mip.net/fileadmin/user_upload/c4mip/CMIP6_C4MIP_landuse_emissions.nc.gz
+ 
+-LU_hist = iris.load('/data/users/hadcn/CMIP6_C4MIP_landuse_emissions.nc')[0]
++LU_hist = iris.load('../CMIP6_C4MIP_landuse_emissions.nc')[0]
+ 
+ # account for different units and interpolate to annual timesteps
+ #
+@@ -387,7 +392,7 @@ https://github.com/ckoven/cmip6_beta_gamma_maps/blob/master/cmip6_beta_gamma_map
+ doi 10.5281/zenodo.6039693 
+ '''
+ 
+-cubes = iris.load('carbon_feedback_parameters.nc')
++cubes = iris.load(path+'carbon_feedback_parameters.nc')
+ 
+ beta  = cubes.extract('beta_ensmean')[0]
+ gamma = cubes.extract('gamma_ensmean')[0]
+@@ -495,7 +500,7 @@ ax1.fill_betweenx(lat,zon_beta_ocn_av.data-zon_beta_ocn_std.data, zon_beta_ocn_a
+                   facecolor='b',alpha=0.2)
+ ax1.set_xlim(-.02,.3)
+ ax1.set_ylim(-95,95)
+-ax1.set_title('                  (a, b) Carbon uptake response to CO$_2$', fontsize=20)
++ax1.set_title('                                          (a, b) Carbon uptake response to CO$_2$', fontsize=20)
+ ax1.set_xlabel('10$^6$ kg C m$^{-1}$ ppm$^{-1}$', fontsize=16)
+ ax1.set_ylabel('latitude', fontsize=16)
+ ax1.text(.15,-30,'Land', color='g', fontsize=14)
+@@ -510,6 +515,8 @@ ax4.fill_betweenx(lat,zon_gamma_ocn_av.data-zon_gamma_ocn_std.data, zon_gamma_oc
+ ax4.yaxis.tick_right()
+ ax4.set_ylim(-95,95)
+ ax4.set_xlabel('10$^6$ kg C m$^{-1}$ $^o$C$^{-1}$', fontsize=16)
++ax4.text(-18,-45,'Land', color='g', fontsize=14)
++ax4.text(-18,-65,'Ocean', color='b', fontsize=14)
+ 
+ for i in np.arange(-75,100,25):
+     ax1.hlines(i, -0.01,0.3, 'gray', alpha=0.2)
+@@ -525,12 +532,15 @@ ax_map.coastlines()
+ ax_map.set_xlim(ax_map.projection.x_limits)
+ ax_map.set_ylim(ax_map.projection.y_limits)
+ 
+-bar_pos = [0.23, 0.725, 0.26, 0.01]  # [left,bottom,width,height]
++legend_handles = [patches.Patch(facecolor='white', hatch='',  edgecolor='black', label='Hight model agreement')]
++legend=ax_map.legend(handles=legend_handles, loc='lower right', bbox_to_anchor=(1, -0.18), ncol=1, fontsize=15)
++legend.get_frame().set_linewidth(0)           # 外框线宽
++
++bar_pos = [0.23, 0.715, 0.26, 0.01]  # [left,bottom,width,height]
+ bar_orientation = "horizontal"     # or "vertical"  or "none" (to skip)
+ bar_ticklen  = 0
+ bar_ticklabs = [-.02,-.01,0,.01,.02]
+ bar_label    = u"kg C m$^{-2}$ ppm$^{-1}$"
+-
+ bar2_axes = fig.add_axes(bar_pos)
+ bar2 = fig.colorbar(coldata, cax=bar2_axes,
+                    orientation=bar_orientation,
+@@ -551,11 +561,14 @@ ax_map = plt.gca()
+ contour_stipple_lo = iplt.contourf(gamma_agr,colors='None',levels=[0,.8],hatches=['////'])
+ 
+ ax_map.coastlines()
+-ax_map.set_title('(c,d) Carbon uptake response to climate warming', fontsize=20)
++ax_map.set_title('            (c,d) Carbon uptake response to climate warming', y=1.05, fontsize=20)
++legend_handles = [patches.Patch(facecolor='white', hatch='////',  edgecolor='black', label='Low model agreement')]
++legend=ax_map.legend(handles=legend_handles, loc='lower left', bbox_to_anchor=(0, -0.18), ncol=1, fontsize=15)
++legend.get_frame().set_linewidth(0)    
+ 
+ bar_label    = u"kg C m$^{-2}$ $^o$C$^{-1}$"
+ 
+-bar_pos = [0.54, 0.725, 0.26, 0.01]  # [left,bottom,width,height]
++bar_pos = [0.54, 0.715, 0.26, 0.01]  # [left,bottom,width,height]
+ bar3_axes = fig.add_axes(bar_pos)
+ bar_ticklabs = [-1, -.5, 0, .5, 1]
+ 
+@@ -596,6 +609,10 @@ ax5.set_xlim(xr[0], xr[1])
+ ax5.set_ylim(300,1200)
+ 
+ ax5.text(1995,1110,'10', fontsize=18, color=col['ssp585'])
++ax5.text(2000,1110,'→ number of model simulations', fontsize=18, color='#7D7C7D')
++ax5.text(2045,910,'shades: uncertainty range', fontsize=18, color='#7D7C7D')
++ax5.set_xlabel('Historical', fontsize=20)
++ax5.xaxis.set_label_coords(0.1, 0.2)
+ 
+ for axes in [ax5,ax6,ax7,ax8]:
+     axes.tick_params(labelsize=18)
+@@ -643,10 +660,10 @@ ax6.text(2004,12.5,'9', fontsize=18, color=col['ssp370'])
+ ax6.text(2007,12.5,'4', fontsize=18, color=col['ssp534'])
+ ax6.text(2010,12.5,'9', fontsize=18, color=col['ssp585'])
+ 
+-ax7.text(2120,12.5,'simulations extended to 2300 for:', fontsize=16)
+-ax7.text(2240,10.5,'SSP5-8.5 [4]', fontsize=18, color=col['ssp585'])
+-ax7.text(2240,9,'SSP5-3.4-OS [4]', fontsize=18, color=col['ssp534'])
+-ax7.text(2240,7.5,'SSP1-2.6 [4]', fontsize=18, color=col['ssp126'])
++ax7.text(2105,14.5,'simulations extended to 2300 for:', fontsize=16)
++ax7.text(2125,8,'SSP5-8.5 [4]', fontsize=18, color=col['ssp585'])
++ax7.text(2125,-3.5,'SSP5-3.4-OS [4]', fontsize=18, color=col['ssp534'])
++ax7.text(2230,3,'SSP1-2.6 [4]', fontsize=18, color=col['ssp126'])
+ 
+ 
+ ######
+@@ -671,7 +688,7 @@ ax8.set_xlim(xr[0],xr[1])
+ ax8.set_ylim(0.25,.75)
+ 
+ ax8.set_title('(g) Sink fraction', fontsize=24, loc='left')
+-ax8.set_xlabel('Year', fontsize=24)
++# ax8.set_xlabel('Year', fontsize=24)
+ 
+ ax8.text(1995,.31,'5', fontsize=18, color=col['ssp119'])
+ ax8.text(1998,.31,'9', fontsize=18, color=col['ssp126'])
+@@ -692,3 +709,5 @@ ax8b.text(2,4.6,'despite growing larger', fontsize=18)
+ 
+ 
+ plt.savefig('TS.5.png')
++plt.savefig('TS.5.pdf')
++plt.savefig('TS.5.svg')

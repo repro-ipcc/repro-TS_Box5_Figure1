@@ -1,0 +1,14 @@
+name: ipcc_tsbox5fig1
+channels:
+  - conda-forge
+  - anaconda
+
+dependencies:
+  - python=3.7
+  - pandas
+  - iris
+  - matplotlib
+  - numpy
+  - cartopy
+  - dask
+
